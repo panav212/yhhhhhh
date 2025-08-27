@@ -22,18 +22,23 @@ jobs:
 
       - name: Download Paper API
         run: |
-          mkdir libs
+          mkdir -p libs
           curl -L -o libs/paper-api.jar \
             https://api.papermc.io/v2/projects/paper/versions/1.21.8/builds/50/downloads/paper-1.21.8-50.jar
 
       - name: Compile plugin
         run: |
           mkdir -p build
-          javac -cp "libs/paper-api.jar" -d build $(find src/main/java -name "*.java")
+          javac -cp "libs/paper-api.jar" -d build $(find src -name "*.java")
+
+      - name: Copy resources (plugin.yml etc.)
+        run: |
+          mkdir -p build-resources
+          cp plugin.yml build-resources/
 
       - name: Package plugin
         run: |
-          jar cvf BrokeSMP.jar -C build/ . plugin.yml
+          jar cvf BrokeSMP.jar -C build . -C build-resources .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
