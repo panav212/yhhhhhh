@@ -36,7 +36,7 @@ jobs:
           jar cvf BrokeSMP.jar -C build/ . plugin.yml
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: BrokeSMP
           path: BrokeSMP.jar
