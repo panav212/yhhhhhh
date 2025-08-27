@@ -1,47 +1,49 @@
-name: Build BrokeSMPV1 (
+name: Build BrokeSMP Plugin
 
 on:
   push:
+    branches: [ main ]
   pull_request:
-  workflow_dispatch:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: 21
 
       - name: Download Paper API
         run: |
-          mkdir -p libs
+          mkdir libs
           curl -L -o libs/paper-api.jar \
-            https://repo.papermc.io/repository/maven-public/io/papermc/paper/paper-api/1.21.8-R0.1-SNAPSHOT/paper-api-1.21.8-R0.1-SNAPSHOT.jar
+            https://api.papermc.io/v2/projects/paper/versions/1.21.8/builds/50/downloads/paper-1.21.8-50.jar
 
-      - name: Compile with javac
+      - name: Compile plugin
         run: |
-          mkdir -p build/classes
-          javac -cp libs/paper-api.jar -d build/classes $(find src/main/java -name "*.java")
+          mkdir -p build
+          javac -cp "libs/paper-api.jar" -d build $(find src -name "*.java")
 
-      - name: Copy resources (plugin.yml etc.)
+      - name: Package plugin
         run: |
-          if [ -d src/main/resources ]; then
-            cp -R src/main/resources/* build/classes/ || true
-          fi
+          jar cvf BrokeSMP.jar -C build/ . plugin.yml
 
-      - name: Package plugin jar
-        run: |
-          jar cf BrokeSMPV1.jar -C build/classes .
-
-      - name: Upload plugin artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: BrokeSMPV1
-          path: BrokeSMPV1.jar
+          name: BrokeSMP
+          path: BrokeSMP.jar
 
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: BrokeSMP.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
