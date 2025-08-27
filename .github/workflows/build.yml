@@ -1,4 +1,4 @@
-name: Build BrokeSMPV1 (javac)
+name: Build BrokeSMPV1 (
 
 on:
   push:
@@ -44,3 +44,4 @@ jobs:
         with:
           name: BrokeSMPV1
           path: BrokeSMPV1.jar
+
